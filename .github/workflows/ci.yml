@@ -43,8 +43,8 @@ jobs:
           context: ./Plateform
           push: true
           tags: |
-            lifesureapp/lifesure-back:latest
-            lifesureapp/lifesure-back:${{ github.sha }}
+            hamma1925/lifesure-back:latest
+            hamma1925/lifesure-back:${{ github.sha }}
 
   build-and-push-fraud:
     needs: test
@@ -63,5 +63,5 @@ jobs:
           context: ./projet-assurance-ia
           push: true
           tags: |
-            lifesureapp/lifesure-fraud:latest
-            lifesureapp/lifesure-fraud:${{ github.sha }}
+            hamma1925/lifesure-fraud:latest
+            hamma1925/lifesure-fraud:${{ github.sha }}
