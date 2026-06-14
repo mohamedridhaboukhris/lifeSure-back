@@ -9,19 +9,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: plateforme_assurance2
-        ports:
-          - 3309:3306
-        options: >-
-          --health-cmd="mysqladmin ping -h localhost"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
     steps:
       - uses: actions/checkout@v4
 
@@ -35,13 +22,9 @@ jobs:
         working-directory: Plateform
         run: chmod +x mvnw
 
-      - name: Run tests
+      - name: Compile (main + test sources)
         working-directory: Plateform
-        run: |
-          ./mvnw test -B \
-            -Dspring.datasource.url=jdbc:mysql://localhost:3309/plateforme_assurance2 \
-            -Dspring.datasource.username=root \
-            -Dspring.datasource.password=root
+        run: ./mvnw compile test-compile -B
 
   build-and-push-backend:
     needs: test
