@@ -26,42 +26,78 @@ jobs:
         working-directory: Plateform
         run: ./mvnw compile test-compile -B
 
-  build-and-push-backend:
+  build-scan-push-backend:
     needs: test
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
 
+      - uses: docker/setup-buildx-action@v3
+
       - uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - uses: docker/build-push-action@v5
+      - name: Build backend image locally
+        uses: docker/build-push-action@v5
         with:
           context: ./Plateform
-          push: true
-          tags: |
-            hamma1925/lifesure-back:latest
-            hamma1925/lifesure-back:${{ github.sha }}
+          load: true
+          push: false
+          tags: hamma1925/lifesure-back:${{ github.sha }}
 
-  build-and-push-fraud:
+      - name: Scan backend image with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: hamma1925/lifesure-back:${{ github.sha }}
+          format: table
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: CRITICAL,HIGH
+
+      - name: Push backend to DockerHub
+        run: |
+          docker tag hamma1925/lifesure-back:${{ github.sha }} hamma1925/lifesure-back:latest
+          docker push hamma1925/lifesure-back:${{ github.sha }}
+          docker push hamma1925/lifesure-back:latest
+
+  build-scan-push-fraud:
     needs: test
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
 
+      - uses: docker/setup-buildx-action@v3
+
       - uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - uses: docker/build-push-action@v5
+      - name: Build fraud image locally
+        uses: docker/build-push-action@v5
         with:
           context: ./projet-assurance-ia
-          push: true
-          tags: |
-            hamma1925/lifesure-fraud:latest
-            hamma1925/lifesure-fraud:${{ github.sha }}
+          load: true
+          push: false
+          tags: hamma1925/lifesure-fraud:${{ github.sha }}
+
+      - name: Scan fraud image with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: hamma1925/lifesure-fraud:${{ github.sha }}
+          format: table
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: CRITICAL,HIGH
+
+      - name: Push fraud to DockerHub
+        run: |
+          docker tag hamma1925/lifesure-fraud:${{ github.sha }} hamma1925/lifesure-fraud:latest
+          docker push hamma1925/lifesure-fraud:${{ github.sha }}
+          docker push hamma1925/lifesure-fraud:latest

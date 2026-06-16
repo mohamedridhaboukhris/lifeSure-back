@@ -5,8 +5,12 @@ from flask import Flask, request, jsonify
 import pickle
 import numpy as np
 from datetime import datetime
+from prometheus_flask_exporter import PrometheusMetrics
 
 app = Flask(__name__)
+
+metrics = PrometheusMetrics(app)
+metrics.info('app_info', 'Fraud Detection Service', version='2.0')
 
 # Charger le modèle au démarrage
 print("🚀 Chargement du modèle de détection de fraude...")

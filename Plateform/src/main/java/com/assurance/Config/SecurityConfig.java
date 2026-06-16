@@ -39,7 +39,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // 🔓 ENDPOINTS PUBLICS
 
-                        .requestMatchers("/api/public", "/api/auth/**", "/error").permitAll()
+                        .requestMatchers("/api/public", "/api/auth/**", "/error",
+                                "/actuator/health", "/actuator/prometheus").permitAll()
 
 //                        .requestMatchers("/api/public", "/api/auth/**").permitAll()
 
