@@ -10,12 +10,12 @@ scrape_configs:
   - job_name: lifesure-back
     metrics_path: /actuator/prometheus
     static_configs:
-      - targets: ['host.docker.internal:8090']
+      - targets: ['lifesure-back:8090']
 
   - job_name: lifesure-fraud
     metrics_path: /metrics
     static_configs:
-      - targets: ['host.docker.internal:5001']
+      - targets: ['lifesure-fraud:5001']
 
   - job_name: lifesure-front-nginx
     static_configs:

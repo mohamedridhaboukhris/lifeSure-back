@@ -1,12 +1,56 @@
 services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: lifesure_root
+      MYSQL_DATABASE: plateforme_assurance2
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-plifesure_root"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  lifesure-back:
+    image: hamma1925/lifesure-back:latest
+    ports:
+      - "8090:8090"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/plateforme_assurance2?createDatabaseIfNotExist=true&useUnicode=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=lifesure_root
+      - JWT_SECRET=lifesure_dev_secret_key_min32chars_ok
+      - SPRING_MAIL_USERNAME=noreply@lifesure.local
+      - SPRING_MAIL_PASSWORD=dummy
+      - GROQ_API_KEY=dummy
+      - STRIPE_SECRET_KEY=sk_test_dummy
+      - APP_FRONTEND_URL=http://localhost:8080
+      - FILE_UPLOAD_DIR=/app/uploads
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+
+  lifesure-fraud:
+    image: hamma1925/lifesure-fraud:latest
+    ports:
+      - "5001:5001"
+    restart: unless-stopped
+
+  lifesure-front:
+    image: hamma1925/lifesure-front:latest
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
   prometheus:
     image: prom/prometheus:latest
     ports:
       - "9090:9090"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     restart: unless-stopped
 
   grafana:
@@ -27,12 +71,13 @@ services:
 
   nginx-exporter:
     image: nginx/nginx-prometheus-exporter:latest
-    command: --nginx.scrape-uri=http://host.docker.internal:80/stub_status
+    command: --nginx.scrape-uri=http://lifesure-front:80/stub_status
     ports:
       - "9113:9113"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    depends_on:
+      - lifesure-front
     restart: unless-stopped
 
 volumes:
+  mysql-data:
   grafana-data:
