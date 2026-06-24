@@ -11,8 +11,6 @@ This directory contains a self-contained Docker Compose stack that runs:
 | **Grafana** | http://localhost:3000 | Dashboards (admin / admin) |
 | **MySQL** | localhost:3306 | Database (internal) |
 
-
-
 ---
 
 ## Prerequisites
