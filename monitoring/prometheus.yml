@@ -3,20 +3,19 @@ global:
   evaluation_interval: 15s
 
 scrape_configs:
-  - job_name: prometheus
+  - job_name: 'prometheus'
     static_configs:
       - targets: ['localhost:9090']
 
-  - job_name: lifesure-back
+  - job_name: 'lifesure-back'
     metrics_path: /actuator/prometheus
     static_configs:
       - targets: ['lifesure-back:8090']
 
-  - job_name: lifesure-fraud
-    metrics_path: /metrics
+  - job_name: 'lifesure-fraud'
     static_configs:
       - targets: ['lifesure-fraud:5001']
 
-  - job_name: lifesure-front-nginx
+  - job_name: 'nginx'
     static_configs:
       - targets: ['nginx-exporter:9113']
