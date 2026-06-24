@@ -13,10 +13,6 @@ This directory contains a self-contained Docker Compose stack that runs:
 
 
 
-
-
-
-
 ---
 
 ## Prerequisites
